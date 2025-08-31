@@ -1,0 +1,41 @@
+name: Test Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Validate test structure
+      run: |
+        echo "Checking test structure..."
+        ls -la tests/manual/
+        ls -la tests/manual/testcases/
+        echo "Test structure validation complete"
+        
+    - name: Count test cases
+      run: |
+        echo "Counting test cases..."
+        find tests/manual/testcases/ -name "TC-*.md" | wc -l
+        
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: |
+          reports/
+          tests/manual/testcases/
+        retention-days: 30
